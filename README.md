@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# PowerManager
-=======
 # PowerManage
 
 PowerManage is a Next.js and FastAPI application for authenticated electricity-bill calculations, account administration, and tariff management. PostgreSQL stores user accounts and revocable sessions; tariff slabs currently remain in a backend JSON file.
@@ -71,4 +68,3 @@ npm run build
 6. Rotate or remove `BOOTSTRAP_TOKEN` and enable `SESSION_COOKIE_SECURE` for HTTPS.
 
 The frontend and backend must be deployed in a cookie-compatible same-site arrangement. Configure exact trusted frontend origins through `CORS_ORIGINS`; wildcard credentialed CORS is rejected.
->>>>>>> 7ab3a64 (Initial commit)
