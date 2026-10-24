@@ -8,6 +8,8 @@ import { DocumentPreview } from "@/components/documents/BillingDocument";
 import { documentBill } from "@/lib/billingDocument";
 import { PaymentReceipt } from "@/components/PaymentReceipt";
 import { useDemoPayments } from "@/hooks/useDemoPayments";
+import { getInvoiceActivity } from "@/services/activityApi";
+import type { InvoiceActivity } from "@/types/activity";
 import { getEffectivePaymentStatus } from "@/services/demoPaymentStorage";
 import { getMyBill, listMyBills } from "@/services/portalApi";
 import type { MyBill, MyBillStatus } from "@/types/portal";
@@ -118,7 +120,8 @@ export function MyInvoiceDetail({ billId, onBack, onPay, onReceipt }: { billId: 
   const payments = useDemoPayments();
   const [bill, setBill] = useState<MyBill | null>(null);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { let active = true; const load = () => { void getMyBill(billId).then((response) => { if (active) { setBill(response); setError(null); } }).catch((caught) => { if (active) setError(caught instanceof Error ? caught.message : "Unable to load this invoice."); }); }; load(); window.addEventListener("powermanage-bill-change", load); return () => { active = false; window.removeEventListener("powermanage-bill-change", load); }; }, [billId]);
+  const [activity, setActivity] = useState<InvoiceActivity[]>([]);
+  useEffect(() => { let active = true; const load = () => { void getMyBill(billId).then((response) => { if (active) { setBill(response); setError(null); } }).catch((caught) => { if (active) setError(caught instanceof Error ? caught.message : "Unable to load this invoice."); }); void getInvoiceActivity(billId).then((entries) => { if (active) setActivity(entries); }).catch(() => { if (active) setActivity([]); }); }; load(); window.addEventListener("powermanage-bill-change", load); return () => { active = false; window.removeEventListener("powermanage-bill-change", load); }; }, [billId]);
   const requestNotice = <RequestError message={error} retry={() => window.dispatchEvent(new Event("powermanage-bill-change"))} />;
   if (!bill && error) return <section><h1>Invoice</h1><button type="button" onClick={onBack}>Back to bills</button>{requestNotice}</section>;
   if (!bill) return <div className="grid min-h-[360px] place-items-center text-sm text-[var(--text-secondary)]"><LoaderCircle className="mr-2 inline h-5 w-5 animate-spin" /> Loading invoice…</div>;
@@ -126,7 +129,7 @@ export function MyInvoiceDetail({ billId, onBack, onPay, onReceipt }: { billId: 
   const payment = authoritativePayment(bill, payments[String(bill.id)]);
   const currentPaymentStatus = getEffectivePaymentStatus(bill, payment);
   const canPay = bill.status !== "paid" && currentPaymentStatus !== "paid";
-  return <>{requestNotice}<DocumentPreview bill={documentBill(bill)} kind="invoice" actions={<><button type="button" onClick={onBack}>Back to bills</button>{canPay && onPay && <button type="button" onClick={() => onPay(bill)}>Pay now</button>}{currentPaymentStatus === "paid" && onReceipt && <button type="button" onClick={() => onReceipt(bill.id)}>View receipt</button>}</>} />{currentPaymentStatus === "failed" && <p role="status" className="document-export-error">The last demo payment failed. You can try again.</p>}</>;
+  return <>{requestNotice}<DocumentPreview bill={documentBill(bill)} kind="invoice" actions={<><button type="button" onClick={onBack}>Back to bills</button>{canPay && onPay && <button type="button" onClick={() => onPay(bill)}>Pay now</button>}{currentPaymentStatus === "paid" && onReceipt && <button type="button" onClick={() => onReceipt(bill.id)}>View receipt</button>}</>} />{activity.length > 0 && <section className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4"><h2 className="font-display text-lg font-bold">Activity</h2><ol className="mt-3 space-y-3 border-l border-[var(--border)] pl-4">{activity.map((event) => <li key={event.id}><p className="text-sm font-semibold">{event.title}</p>{event.description && <p className="text-xs text-[var(--text-secondary)]">{event.description}</p>}<time className="text-xs text-[var(--text-muted)]">{new Date(event.created_at).toLocaleString("en-IN")}</time></li>)}</ol></section>}{currentPaymentStatus === "failed" && <p role="status" className="document-export-error">The last demo payment failed. You can try again.</p>}</>;
 }
 
 export function MyReceiptDetail({ billId, onBack }: { billId: number; onBack: () => void }) {

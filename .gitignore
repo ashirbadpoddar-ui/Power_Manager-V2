@@ -105,7 +105,8 @@ frontend/output/
 *.md
 !README.md
 !brain.md
-!electricity-bill-calculator/README.md
-!electricity-bill-calculator/DESIGN.md
-!electricity-bill-calculator/SMTP_NOTIFICATIONS.md
+!backend/README.md
+!backend/DESIGN.md
+!backend/SMTP_NOTIFICATIONS.md
 !frontend/DESIGN-MAPPING.md
+!frontend/DEPLOYMENT.md

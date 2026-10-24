@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Bell,
   Building2,
   CircleDollarSign,
   ChevronDown,
@@ -42,6 +41,8 @@ import { UserDashboard } from "@/components/user/UserDashboard";
 import { MyMeter } from "@/components/user/MyMeter";
 import { MyBills, MyInvoiceDetail, MyReceiptDetail } from "@/components/user/MyBills";
 import { Consumption } from "@/components/user/Consumption";
+import { AuditLog } from "@/components/AuditLog";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { useDemoPayments } from "@/hooks/useDemoPayments";
 import { dashboardData } from "@/lib/dashboardData";
 import { listBills, markBillPaid, resetWorkspaceData } from "@/services/electricityApi";
@@ -75,6 +76,7 @@ type View =
   | "system-settings"
   | "calculator"
   | "tariff-settings"
+  | "audit-log"
   | "my-meter"
   | "my-bills"
   | "consumption"
@@ -95,6 +97,7 @@ const reportNav: NavItem[] = [
   { label: "Reports", view: "reports", icon: FileBarChart },
   { label: "Calculator", view: "calculator", icon: CircleDollarSign },
   { label: "Tariff Settings", view: "tariff-settings", icon: Sliders },
+  { label: "Audit log", view: "audit-log", icon: Shield },
 ];
 const userNav: NavItem[] = [
   { label: "Dashboard", view: "Dashboard", icon: LayoutDashboard },
@@ -293,7 +296,7 @@ function Header({
   administrator: boolean;
 }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const pageTitle = activeView === "Dashboard" ? "Dashboard" : activeView === "owner" ? "Bill generation" : activeView === "billing" ? "Billing & invoices" : activeView === "readings" ? "Meter readings" : activeView === "my-meter" ? "My Meter" : activeView === "my-bills" ? "My Bills" : activeView === "consumption" ? "Consumption" : activeView === "invoice-details" ? "Invoice" : activeView === "payment-receipt" ? "Payment receipt" : activeView === "properties" ? "Properties" : activeView === "reports" ? "Reports" : activeView === "calculator" ? "Calculator" : activeView === "tariff-settings" ? "Tariff settings" : activeView === "profile-settings" ? "My profile" : activeView === "users-roles" ? "Permissions & roles" : "System settings";
+  const pageTitle = activeView === "Dashboard" ? "Dashboard" : activeView === "owner" ? "Bill generation" : activeView === "billing" ? "Billing & invoices" : activeView === "readings" ? "Meter readings" : activeView === "my-meter" ? "My Meter" : activeView === "my-bills" ? "My Bills" : activeView === "consumption" ? "Consumption" : activeView === "invoice-details" ? "Invoice" : activeView === "payment-receipt" ? "Payment receipt" : activeView === "properties" ? "Properties" : activeView === "reports" ? "Reports" : activeView === "calculator" ? "Calculator" : activeView === "tariff-settings" ? "Tariff settings" : activeView === "audit-log" ? "Audit log" : activeView === "profile-settings" ? "My profile" : activeView === "users-roles" ? "Permissions & roles" : "System settings";
 
   return (
     <header className="app-shell app-header flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] px-4 py-2 sm:px-6 lg:px-8">
@@ -312,13 +315,7 @@ function Header({
 
       <div className="flex items-center gap-2 sm:gap-4">
 
-        <Button
-          aria-label="Notifications"
-          className="relative grid h-11 w-11 place-items-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] sm:h-9 sm:w-9"
-        >
-          <Bell className="h-4 w-4" />
-          <span className="absolute right-2 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--error)] ring-2 ring-[var(--surface)]" />
-        </Button>
+        <NotificationCenter />
 
         {/* ACCOUNT */}
         <div className="relative border-l border-[var(--border)] pl-2 sm:pl-4">
@@ -736,6 +733,9 @@ else if (activeView === "calculator") {
 }
 else if (activeView === "tariff-settings") {
   content = isAdministrator ? <TariffSettings /> : <PlaceholderView title="Access denied" description="Administrator access is required." icon={Shield} />;
+}
+else if (activeView === "audit-log") {
+  content = isAdministrator ? <AuditLog /> : <PlaceholderView title="Access denied" description="Administrator access is required." icon={Shield} />;
 }
 
 else {
