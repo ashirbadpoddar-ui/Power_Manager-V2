@@ -55,6 +55,9 @@ class Settings(BaseSettings):
             value = "postgresql+psycopg://" + value[len("postgres://"):]
         if not value.startswith("postgresql+psycopg://"):
             raise ValueError("DATABASE_URL must use the postgresql+psycopg:// dialect")
+        if "supabase.com" in value and "sslmode=" not in value:
+            delimiter = "&" if "?" in value else "?"
+            value = f"{value}{delimiter}sslmode=require"
         return value
 
     @field_validator("test_database_url")
@@ -88,15 +91,15 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_deployment_security(self):
-        if self.effective_session_cookie_samesite == "none" and not self.session_cookie_secure:
-            raise ValueError("SESSION_COOKIE_SECURE must be true when SESSION_COOKIE_SAMESITE=none")
         if self.app_env in {"staging", "production"}:
             if not self.session_cookie_secure:
-                raise ValueError("SESSION_COOKIE_SECURE must be true outside development")
+                object.__setattr__(self, "session_cookie_secure", True)
             if not self.rate_limit_enabled:
-                raise ValueError("RATE_LIMIT_ENABLED must be true outside development")
+                object.__setattr__(self, "rate_limit_enabled", True)
             if self.bootstrap_token is not None and len(self.bootstrap_token.get_secret_value()) < 32:
                 raise ValueError("BOOTSTRAP_TOKEN must contain at least 32 characters outside development")
+        if self.effective_session_cookie_samesite == "none" and not self.session_cookie_secure:
+            object.__setattr__(self, "session_cookie_secure", True)
         return self
 
     @property
