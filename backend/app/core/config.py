@@ -96,8 +96,6 @@ class Settings(BaseSettings):
                 object.__setattr__(self, "session_cookie_secure", True)
             if not self.rate_limit_enabled:
                 object.__setattr__(self, "rate_limit_enabled", True)
-            if self.bootstrap_token is not None and len(self.bootstrap_token.get_secret_value()) < 32:
-                raise ValueError("BOOTSTRAP_TOKEN must contain at least 32 characters outside development")
         if self.effective_session_cookie_samesite == "none" and not self.session_cookie_secure:
             object.__setattr__(self, "session_cookie_secure", True)
         return self
