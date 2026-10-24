@@ -100,7 +100,9 @@ export async function apiRequest<T>(
       details = undefined;
     }
 
-    console.error("PowerManage API request failed", { method, path, status: response.status, details });
+    if (!(response.status === 401 && options.notifyOnUnauthorized === false)) {
+      console.error("PowerManage API request failed", { method, path, status: response.status, details });
+    }
     const message = response.status >= 500
       ? (path === "/api/auth/me" ? "Unable to verify your session. Please try again." : "Request failed. Please try again.")
       : response.status === 403
