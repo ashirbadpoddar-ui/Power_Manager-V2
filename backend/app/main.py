@@ -1,5 +1,11 @@
 import logging
+import sys
+from pathlib import Path
 from uuid import uuid4
+
+backend_root = str(Path(__file__).resolve().parent.parent)
+if backend_root not in sys.path:
+    sys.path.insert(0, backend_root)
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
