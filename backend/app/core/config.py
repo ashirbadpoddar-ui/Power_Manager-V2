@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     @classmethod
     def validate_database_url(cls, value: str) -> str:
         value = value.strip()
+        if value.startswith("postgresql://"):
+            value = "postgresql+psycopg://" + value[len("postgresql://"):]
+        elif value.startswith("postgres://"):
+            value = "postgresql+psycopg://" + value[len("postgres://"):]
         if not value.startswith("postgresql+psycopg://"):
             raise ValueError("DATABASE_URL must use the postgresql+psycopg:// dialect")
         return value

@@ -44,6 +44,15 @@ app.include_router(meter_readings_router)
 app.include_router(my_account_router)
 app.include_router(activity_router)
 
+
+@app.get("/")
+def root_health():
+    return {
+        "status": "healthy",
+        "service": "PowerManage Backend",
+        "version": settings.app_version,
+    }
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
