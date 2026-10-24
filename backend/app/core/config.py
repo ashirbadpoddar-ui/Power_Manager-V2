@@ -11,10 +11,10 @@ class Settings(BaseSettings):
     app_name: str = "Electricity Bill Calculator"
     app_version: str = "1.0.0"
     app_env: Literal["development", "test", "staging", "production"] = "development"
-    database_url: str
+    database_url: str = "postgresql+psycopg://powermanage.bsgsushrmkrhmmycsfpr:PM_Supabase_Prod_2026_xK9vQ8zL4m@aws-0-ap-south-1.pooler.supabase.com:5432/postgres"
     test_database_url: str | None = None
     bootstrap_token: SecretStr | None = None
-    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000,https://power-manager-v2.vercel.app"
     session_ttl_hours: int = 168
     session_cookie_secure: bool = False
     session_cookie_samesite: Literal["lax", "strict", "none"] | None = None
